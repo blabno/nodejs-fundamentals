@@ -1,18 +1,16 @@
 # NodeJS Fundamentals
 
-Run NodeJS locally:
+## Sum script
 
-    node index.js
+    node sum.js 1 2
     
-Run NodeJS in docker:
+or
 
-    docker-compose up app
+    docker-compose run --rm app node sum.js 1 2
 
-or (using bash shell)
+alternatively
 
-    docker run -it --rm -v $(pwd):/app -w /app node:8.9 node index.js
-
-or (using fish shell)
-
-    docker run -it --rm -v (pwd):/app -w /app node:8.9 node index.js
+    chmod +x sum.js
     
+    ./sum.js #treated as shell script
+    docker-compose run --rm app ./sum.js
