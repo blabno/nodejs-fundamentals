@@ -1,0 +1,7 @@
+{
+  "name": "nodejs-fundamentals",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Bernard Labno <bernard.labno@pjwstk.edu.pl>",
+  "license": "MIT"
+}
