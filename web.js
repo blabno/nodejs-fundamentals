@@ -1,31 +1,51 @@
-const http = require('http');
-const fs = require('fs');
-const url = require('url');
-const util = require('util');
+'use strict';
 
-const exists = util.promisify(fs.exists);
-const readFile = util.promisify(fs.readFile);
+const hapi = require('hapi');
+const joi = require('joi');
 
-// Create a server
-const port = 8080;
-http.createServer(async (request, response) => {
-  const parsedUrl = url.parse(request.url);
-  const pathname = parsedUrl.pathname;
+const posts = [
+  { title: 'Vitalik Buterin: “I definitely hope centralized exchanges go burn in hell as much as possible”' },
+  { title: '"A question for EOS": why is EOS worth $4 billion? -> get not a single comprehensible expert answer within 8 minutes. ' }
+];
 
-  console.log('Request for ' + pathname + ' received.');
+function searchPosts(from = 0, size) {
+  return posts.slice(from, size && from + size);
+}
 
-  const localPath = `${__dirname}/${pathname}`;
-  const fileExists = await exists(localPath);
-  if (fileExists) {
-    response.writeHead(200, { 'Content-Type': 'text/html' });
-    response.write(await readFile(localPath));
-  } else {
-    response.writeHead(404);
-    response.write(`File ${pathname} not found`);
-  }
-  response.end();
+(async () => {
+  const server = await new hapi.Server({
+    port: 8080,
+    routes: {
+      validate: {
+        failAction: async (request, h, err) => {
+          if (err && err.isJoi) {
+            throw err;
+          } else {
+            throw Boom.badRequest('Invalid request payload input');
+          }
+        }
+      }
+    }
+  });
 
-}).listen(port);
+  server.route({
+    method: 'GET',
+    path: '/api/posts',
+    config: {
+      description: 'Get posts',
+      tags: ['api'],
+      validate: {
+        query: joi.object({
+          from: joi.number().integer(),
+          size: joi.number().integer()
+        }).label('getPostsRequest')
+      }
+    },
+    handler(request) {
+      return searchPosts(request.query.from, request.query.size);
+    }
+  });
 
-// Console will print the message
-console.log(`Server running at http://127.0.0.1:${port}/`);
+  await server.start();
+  console.log('info', `Server running at: ${server.info.uri}`);
+})();
