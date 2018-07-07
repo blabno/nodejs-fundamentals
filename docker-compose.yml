@@ -1,6 +1,8 @@
 app:
   image: node:8.9
-  command: node index.js
+  command: node web.js
   working_dir: /app
   volumes:
     - ./:/app
+  ports:
+    - 8080:8080
