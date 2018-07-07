@@ -5,7 +5,7 @@
   "author": "Bernard Labno <bernard.labno@pjwstk.edu.pl>",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon web.js"
+    "start": "nodemon app/web.js"
   },
   "dependencies": {
     "hapi": "17.5.2",

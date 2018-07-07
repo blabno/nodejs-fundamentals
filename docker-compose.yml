@@ -1,6 +1,6 @@
 app:
   image: node:8.9
-  command: node web.js
+  command: yarn start
   working_dir: /app
   volumes:
     - ./:/app
