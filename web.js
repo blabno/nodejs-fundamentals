@@ -1,18 +1,28 @@
 const http = require('http');
 const fs = require('fs');
 const url = require('url');
+const util = require('util');
+
+const exists = util.promisify(fs.exists);
+const readFile = util.promisify(fs.readFile);
 
 // Create a server
 const port = 8080;
-http.createServer(function (request, response) {
+http.createServer(async (request, response) => {
   const parsedUrl = url.parse(request.url);
   const pathname = parsedUrl.pathname;
 
   console.log('Request for ' + pathname + ' received.');
 
-  response.writeHead(200, { 'Content-Type': 'text/html' });
-  response.write('<h1>Hello World!</h1>');
-  response.write(`<pre>${JSON.stringify(parsedUrl, null, 2)}</pre>`);
+  const localPath = `${__dirname}/${pathname}`;
+  const fileExists = await exists(localPath);
+  if (fileExists) {
+    response.writeHead(200, { 'Content-Type': 'text/html' });
+    response.write(await readFile(localPath));
+  } else {
+    response.writeHead(404);
+    response.write(`File ${pathname} not found`);
+  }
   response.end();
 
 }).listen(port);
